@@ -9,24 +9,27 @@ const post = require("./routes/post");
 const app = express();
 
 mongoose
-  .connect(process.env.MONGO_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => {
-    console.log("DBConnection Sufccessful");
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+    .connect(process.env.MONGO_URL, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    })
+    .then(() =>
+    {
+        console.log("DBConnection Sufccessful");
+    })
+    .catch((err) =>
+    {
+        console.log(err);
+    });
 
 app.use(cors());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use("/api", user);
-app.use("/user", post);
+app.use("/auth", user);
+app.use("/post", post);
 
-app.listen(process.env.PORT || 4000, () => {
-  console.log("Backend");
+app.listen(process.env.PORT || 8080, () =>
+{
+    console.log("Backend");
 });
