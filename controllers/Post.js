@@ -27,11 +27,30 @@ exports.getPosts = async (req, res) =>
     try
     {
         const getPost = await Post.find();
-        // .select is used to get specific fields from documents
-        // const getPost = await Post.find({ userId: req.user.id }).select("description title");
         return res.status(200).json({
             status: "Success",
             data: getPost
+        });
+    } catch (e)
+    {
+        console.log(e);
+    }
+};
+
+exports.getPostById = async (req, res) =>
+{
+    try
+    {
+        let isLiked = 0
+        const post = await Post.findById({ _id: req.body.id });
+        if (post.likes.filter(x => JSON.stringify(x.userId) === JSON.stringify(req.user.id)).length > 0)
+        {
+            isLiked = 1
+        }
+        var newF = { ...post._doc, isLiked }
+        return res.status(200).json({
+            status: "Success",
+            data: newF,
         });
     } catch (e)
     {

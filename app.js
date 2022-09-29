@@ -15,7 +15,7 @@ mongoose
     })
     .then(() =>
     {
-        console.log("DBConnection Sufccessful");
+        console.log("Connected");
     })
     .catch((err) =>
     {
@@ -31,5 +31,5 @@ app.use("/post", post);
 
 app.listen(process.env.PORT || 8080, () =>
 {
-    console.log("Backend");
+    console.log("PORT", 8080);
 });
