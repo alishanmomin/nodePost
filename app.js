@@ -5,6 +5,7 @@ var cors = require("cors");
 const bodyParser = require("body-parser");
 const user = require("./routes/user");
 const post = require("./routes/post");
+const categories = require("./routes/categories");
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use("/auth", user);
 app.use("/post", post);
+app.use("/category", categories);
 
 app.listen(process.env.PORT || 8080, () =>
 {
