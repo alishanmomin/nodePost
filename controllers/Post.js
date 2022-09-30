@@ -125,4 +125,54 @@ exports.postLike = async (req, res) =>
     }
 };
 
+exports.addComment = async (req, res) =>
+{
+
+    try
+    {
+        await Post.findByIdAndUpdate(
+            { _id: req.body.id },
+            { $push: { comments: { userId: req.user.id, comment: req.body.comment } } }
+        );
+        return res.status(200).json({
+            status: "Comment Added"
+        });
+    } catch (e)
+    {
+        console.log(e);
+    }
+};
+
+exports.removeComment = async (req, res) =>
+{
+
+    try
+    {
+        let isRemoved = 0
+        const postUser = await Post.findById({ _id: req.body.id });
+
+        postUser.comments.length > 0 && postUser.comments.forEach((item) =>
+        {
+            if (JSON.stringify(item.userId) === JSON.stringify(req.user.id))
+            {
+                isRemoved = 1
+            }
+        })
+
+        if (isRemoved === 1)
+        {
+            await Post.findByIdAndUpdate(
+                { _id: req.body.id },
+                { $pull: { comments: { _id: req.body.commentId } } }
+            );
+            return res.status(200).json({
+                status: "Comment Removed"
+            });
+        }
+    } catch (e)
+    {
+        console.log(e);
+    }
+};
+
 

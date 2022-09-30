@@ -7,6 +7,7 @@ const {
     postLike,
     updatePost,
     addComment,
+    removeComment
 } = require("../controllers/Post");
 
 const { verifyToken } = require("../middleware/verifyToken");
@@ -17,6 +18,7 @@ router.post("/getpostbyid", verifyToken, getPostById);
 router.post("/deletepost", verifyToken, deletePost);
 router.post("/postlike", verifyToken, postLike);
 router.post("/updatePost", verifyToken, updatePost);
-// router.post("/addcomment", verifyToken, addComment);
+router.post("/addcomment", verifyToken, addComment);
+router.post("/removeComment", verifyToken, removeComment);
 
 module.exports = router;
