@@ -1,16 +1,12 @@
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 
 exports.register = async (req, res) =>
 {
-    const { userName, mobile, email, password } = req.body;
+    // const { userName, mobile, email, password } = req.body;
 
-    const newUser = new User({
-        userName,
-        mobile,
-        email,
-        password,
-    });
+
     const found = await User.findOne({ email: req.body.email })
     if (found)
     {
@@ -19,16 +15,45 @@ exports.register = async (req, res) =>
         });
     } else
     {
-        try
-        {
-            const user = await newUser.save();
-            res.status(200).json(user);
-        } catch (e)
-        {
-            res.status(400).json({
-                error: e.message
+
+        bcrypt.hash(req.body.password, 12)
+            .then((hashedPw) =>
+            {
+                const newUser = new User(req.body);
+                console.log("newUser", newUser)
+                newUser.password = hashedPw;
+                newUser
+                    .save()
+                    .then((result) =>
+                    {
+                        res.json({
+                            status: "success",
+                            message: "user created successfully",
+                        });
+                    })
+                    .catch((e) =>
+                    {
+                        res.status(400).json({
+                            error: e.message
+                        });
+                    });
+            })
+            .catch((e) =>
+            {
+                res.status(400).json({
+                    error: e.message
+                });
             });
-        }
+        // try
+        // {
+        //     const user = await newUser.save();
+        //     res.status(200).json(user);
+        // } catch (e)
+        // {
+        //     res.status(400).json({
+        //         error: e.message
+        //     });
+        // }
     }
 };
 
@@ -37,22 +62,15 @@ exports.login = async (req, res) =>
     try
     {
         const foundUser = await User.findOne({ email: req.body.email });
+        let passwordComparison = await bcrypt.compare(req.body.password, foundUser.password);
         if (!foundUser)
         {
             res.status(500).json({
-                message: "Invalid Credentials"
+                message: "No account Exist with this email"
             });
 
         }
-        else if (foundUser.password !== req.body.password)
-        {
-            res.status(500).json({
-                message: "Invalid Credentials"
-            });
-
-        }
-
-        else if (foundUser.password === req.body.password)
+        else if (passwordComparison)
         {
             const accessToken = jwt.sign(
                 { id: foundUser._id },
@@ -64,6 +82,13 @@ exports.login = async (req, res) =>
                 userID: foundUser._id,
                 token: accessToken,
             });
+        }
+        else 
+        {
+            res.status(500).json({
+                message: "Invalid Credentials"
+            });
+
         }
 
     } catch (error)
